@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Профорієнтаційний тест</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 0 10px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .personal-info, .question {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .options label {
+      font-weight: normal;
+      margin-left: 20px;
+      display: block;
+      margin-bottom: 6px;
+    }
+    button {
+      background: #3498db;
+      border: none;
+      padding: 12px 25px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      display: block;
+      margin: 20px auto 40px auto;
+    }
+    .results {
+      background: #ecf0f1;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #bbb;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>Профорієнтаційний тест</h1>
+  <form id="testForm">
+    <div class="personal-info">
+      <label for="surname">Прізвище:</label>
+      <input type="text" id="surname" required />
+      <label for="name">Ім'я:</label>
+      <input type="text" id="name" required />
+    </div>
+
+    <div id="questions"></div>
+
+    <button type="button" onclick="calculateResults()">Показати результати</button>
+  </form>
+
+  <div id="results" class="results"></div>
+
+  <script>
+    const questions = [
+      { text: "Я швидко звикаю до нових умов", group: "Адаптивність" },
+      { text: "Я краще працюю самостійно, ніж у команді", group: "Інтровертність" },
+      { text: "Мені важливо постійно навчатись чомусь новому", group: "Розвиток" },
+      { text: "Я легко справляюсь зі стресом", group: "Емоційна регуляція" },
+      { text: "Я часто мислю образами та схемами", group: "Візуал" },
+      { text: "Мене цікавлять технічні механізми", group: "Техніка" },
+      { text: "Я люблю створювати щось нове", group: "Креатив" },
+      { text: "Я намагаюсь бути корисним для інших", group: "Допомога" },
+      { text: "Мені подобається планувати наперед", group: "Стратег" },
+      { text: "Я не боюсь критикувати або бути скритикованим", group: "Критика" },
+      { text: "Мені легше зрозуміти нову тему, якщо пояснити логічно", group: "Логік" },
+      { text: "Я часто дію імпульсивно", group: "Імпульсивність" },
+      { text: "Мене надихає стабільна робота", group: "Стабільність" },
+      { text: "Я прагну реалізовувати себе через творчість", group: "Творення" },
+      { text: "Я краще засвоюю інформацію через практику", group: "Практик" },
+      { text: "Мене мотивує можливість допомагати людям", group: "Допомога" },
+      { text: "Я часто мислю наперед, враховуючи наслідки", group: "Стратег" },
+      { text: "Я легко тримаю свої емоції під контролем", group: "Емоційна регуляція" },
+      { text: "Я отримую задоволення від роботи в команді", group: "Екстравертність" },
+      { text: "Мені важливо відчувати сенс у роботі", group: "Цінності" },
+    ];
+
+    const answerLabels = [
+      "1 — зовсім не про мене",
+      "2 — радше ні",
+      "3 — частково",
+      "4 — радше так",
+      "5 — дуже про мене"
+    ];
+
+    const groups = {};
+    questions.forEach((q, i) => {
+      if (!groups[q.group]) groups[q.group] = [];
+      groups[q.group].push(i);
+    });
+
+    // Створюємо HTML питань
+    const container = document.getElementById("questions");
+    questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `<label><b>${i + 1}. ${q.text}</b></label><div class="options">` +
+        answerLabels.map((label, idx) =>
+          `<label><input type="radio" name="q${i}" value="${idx + 1}" required> ${label}</label>`
+        ).join("") +
+        `</div>`;
+      container.appendChild(div);
+    });
+
+    function calculateResults() {
+      const surname = document.getElementById("surname").value.trim();
+      const name = document.getElementById("name").value.trim();
+      if (!surname || !name) {
+        alert("Будь ласка, введіть прізвище та ім'я.");
+        return;
+      }
+
+      // Збираємо результати по групах
+      const results = {};
+      for (const group in groups) {
+        let sum = 0;
+        let count = 0;
+        groups[group].forEach(i => {
+          const val = document.querySelector(`input[name=q${i}]:checked`);
+          if (val) {
+            sum += parseInt(val.value);
+            count++;
+          }
+        });
+        if (count > 0) {
+          const avg = sum / count;
+          let level = "";
+          if (avg >= 4.1) level = "Виражена риса";
+          else if (avg >= 3.1) level = "Помірно виражена";
+          else if (avg >= 2.1) level = "Слабко виражена";
+          else level = "Нехарактерна";
+          results[group] = { avg: avg.toFixed(2), level };
+        }
+      }
+
+      // Показати результати на сторінці
+      let output = `<h2>Результати для ${surname} ${name}</h2><table><tr><th>Категорія</th><th>Середнє</th><th>Рівень</th></tr>`;
+      for (const g in results) {
+        output += `<tr><td>${g}</td><td>${results[g].avg}</td><td>${results[g].level}</td></tr>`;
+      }
+      output += '</table>';
+      document.getElementById("results").innerHTML = output;
+
+      // Відправка результатів у Google Таблицю (підстав свій URL)
+      fetch("https://script.google.com/macros/s/ВАШ_КОД/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          surname: surname,
+          name: name,
+          results: results
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(response => {
+        if (response.ok) {
+          console.log("Результати успішно надіслані");
+        } else {
+          console.error("Помилка при надсиланні результатів");
+        }
+      }).catch(e => console.error("Помилка мережі:", e));
+    }
+  </script>
+</body>
+</html>
